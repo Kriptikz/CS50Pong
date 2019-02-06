@@ -54,7 +54,7 @@ end
 function Paddle:aimove()
     -- called when we want the AI to handle movement,
     -- a simple call to set our y location to the same as the ball
-    self.y = ball.y;
+    self.y = (ball.y + (ball.height / 2)) - (self.height / 2);
 end
 
 --[[
