@@ -32,6 +32,7 @@ function Paddle:init(x, y, width, height)
     self.width = width
     self.height = height
     self.dy = 0
+    self.ai = false
 end
 
 function Paddle:update(dt)
@@ -48,6 +49,12 @@ function Paddle:update(dt)
     else
         self.y = math.min(VIRTUAL_HEIGHT - self.height, self.y + self.dy * dt)
     end
+end
+
+function Paddle:aimove()
+    -- called when we want the AI to handle movement,
+    -- a simple call to set our y location to the same as the ball
+    self.y = ball.y;
 end
 
 --[[

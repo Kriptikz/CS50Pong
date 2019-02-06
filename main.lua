@@ -233,21 +233,29 @@ function love.update(dt)
     -- paddles can move no matter what state we're in
     --
     -- player 1
-    if love.keyboard.isDown('w') then
-        player1.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('s') then
-        player1.dy = PADDLE_SPEED
-    else
-        player1.dy = 0
+    if player1.ai then
+        player1:aimove()
+    else       
+        if love.keyboard.isDown('w') then
+            player1.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('s') then
+            player1.dy = PADDLE_SPEED
+        else
+            player1.dy = 0
+        end
     end
 
     -- player 2
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
+    if player2.ai then
+        player2:aimove()
     else
-        player2.dy = 0
+        if love.keyboard.isDown('up') then
+            player2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
     end
 
     -- update our ball based on its DX and DY only if we're in play state;
@@ -295,6 +303,18 @@ function love.keypressed(key)
             else
                 servingPlayer = 1
             end
+        end
+    elseif key == 'lctrl' then
+        if player1.ai then
+            player1.ai = false
+        else
+            player1.ai = true
+        end
+    elseif key == 'rctrl' then
+        if player2.ai then
+            player2.ai = false
+        else
+            player2.ai = true
         end
     end
 end
