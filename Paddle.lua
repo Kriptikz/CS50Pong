@@ -51,10 +51,20 @@ function Paddle:update(dt)
     end
 end
 
+--[[
+    To be called in our main files update function before checking
+    player input to override player movement with ai movement 
+]]
 function Paddle:aimove()
-    -- called when we want the AI to handle movement,
-    -- a simple call to set our y location to the same as the ball
-    self.y = (ball.y + (ball.height / 2)) - (self.height / 2);
+
+    -- check if the top edge of the ball is below the bottom range point of the paddle then move
+    if ball.y > self.y + ( 4 * (self.height / 6)) then
+        self.dy = PADDLE_SPEED
+    elseif ball.y + ball.height < self.y + ( 2 * (self.height / 6)) then
+        self.dy = -PADDLE_SPEED
+    else
+        self.dy = 0
+    end
 end
 
 --[[
