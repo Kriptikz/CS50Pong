@@ -57,10 +57,35 @@ end
 ]]
 function Paddle:aimove()
 
-    -- check if the top edge of the ball is below the bottom range point of the paddle then move
-    if ball.y > self.y + ( 4 * (self.height / 6)) then
+    -- Get the slope
+    slope = ball.dy / ball.dx
+
+    -- Calculate the location the ball will be when it reaches the paddles x location,
+    -- taking into account the width of the paddle
+    predicted_ball_x = self.x + (self.width / 2);
+    predicted_ball_y = slope * (predicted_ball_x - ball.x) + ball.y
+
+    --[[
+        The ball doesn't have to hit the paddle at the center perfectly
+        we can create a top and bottom range that the ball can hit the paddle in
+        this keeps the ai from bouncing the paddle around like crazy since it can't
+        get the ball perfectly centerted using a high value for PADDLE_SPEED
+    ]]
+
+    -- the number of fractions we will split our paddle height into
+    paddle_fractions = 6
+
+    -- the top range will be one fraction length from the top of the paddle
+    top_range = self.y + (self.height / paddle_fractions)
+
+    -- the bottom range will be one fraction length from the bottom of the paddle
+    bottom_range = self.y + ((paddle_fractions - 1) * self.height / paddle_fractions)
+
+    -- Move our paddle using PADDLE_SPEED until the paddle had the predicted_ball_y
+    -- within our top and bottom range. Negative speed is up, Positive speed is down.
+    if predicted_ball_y > bottom_range then
         self.dy = PADDLE_SPEED
-    elseif ball.y + ball.height < self.y + ( 2 * (self.height / 6)) then
+    elseif predicted_ball_y < top_range then
         self.dy = -PADDLE_SPEED
     else
         self.dy = 0
