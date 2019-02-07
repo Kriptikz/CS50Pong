@@ -230,7 +230,8 @@ function love.update(dt)
     end
 
     --
-    -- paddles can move no matter what state we're in
+    -- if the player ai is not active, then check for player input
+    -- and move the paddles appropriately
     --
     -- player 1
     if player1.ai then

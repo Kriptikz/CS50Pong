@@ -57,14 +57,15 @@ end
 ]]
 function Paddle:aimove()
 
-    -- Only move the paddles if we are in the play gameState
+    -- Only move the paddles if we are in the gameState play
     if gameState == 'play' then 
-        -- Get the slope
-        slope = ball.dy / ball.dx
+
 
         -- Calculate the location the ball will be when it reaches the paddles x location,
         -- taking into account the width of the paddle
         predicted_ball_x = self.x + (self.width / 2);
+
+        slope = ball.dy / ball.dx
         predicted_ball_y = slope * (predicted_ball_x - ball.x) + ball.y
 
         --[[
@@ -83,7 +84,7 @@ function Paddle:aimove()
         -- the bottom range will be one fraction length from the bottom of the paddle
         bottom_range = self.y + ((paddle_fractions - 1) * self.height / paddle_fractions)
 
-        -- Move our paddle using PADDLE_SPEED until the paddle had the predicted_ball_y
+        -- Move our paddle using PADDLE_SPEED until the paddle has the predicted_ball_y
         -- within our top and bottom range. Negative speed is up, Positive speed is down.
         if predicted_ball_y > bottom_range then
             self.dy = PADDLE_SPEED
