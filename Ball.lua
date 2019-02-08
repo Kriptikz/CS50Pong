@@ -55,6 +55,7 @@ function Ball:collides(paddle)
     --if x_distance_travelled > self.collision_points_offset then
 
         -- how many points we need to check for collisions for from in between frames
+        -- atm just checking every point in between last and current position
         local points_to_generate = x_distance_travelled --math.floor(x_distance_travelled / self.collision_points_offset)
 
         -- if we travelled far enough to generate more than 1 point,
@@ -72,11 +73,11 @@ function Ball:collides(paddle)
 
         -- convert it to a unit vector
         local vector_length = math.abs(math.sqrt((last_move_vector_x * last_move_vector_x) + (last_move_vector_y * last_move_vector_y)))
-
         local unit_vector_x = last_move_vector_x / vector_length
         local unit_vector_y = last_move_vector_y / vector_length
 
         -- scale our unit vector by our collision_points_offset
+        -- atm just checking every point in between last and current position so collision_points_offset is only 1
         local move_vector_x = unit_vector_x * self.collision_points_offset
         local move_vector_y = unit_vector_y * self.collision_points_offset
 
@@ -151,6 +152,8 @@ function Ball:reset()
 end
 
 function Ball:update(dt)
+
+    -- keep our x and y location from this frame before we change them
     self.last_x = self.x
     self.last_y = self.y
 
