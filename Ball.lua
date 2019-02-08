@@ -25,9 +25,10 @@ function Ball:init(x, y, width, height)
     self.dy = 0
     self.dx = 0
 
-    -- offset along x axis for collision points to be generated
-    -- for checking collision between frames
-    self.collision_points_offset = 1
+    -- Max x distant the ball can travel before we need to check for collision.
+    -- If the ball travels beyond this in one frame we check between frames
+    -- using our last_x and last_y
+    self.max_travel_x = 6
 
     -- last_x and last_y are the x and y from last frame, for use in collision detection
     self.last_x = self.x
@@ -39,106 +40,61 @@ end
     on whether their rectangles are overlapping or overlapped between frames.
 ]]
 function Ball:collides(paddle)
-    --[[ 
-        we will use last_x and last_y to generate a set of points we can use to 
-        check for collision between last frame and this frame. Each generated point
-        will be offset by collision_points_offset from the last point. The amount of 
-        point generated will be determined by the distance it travelled between frames.
-    ]]
 
+    -- We will first calculate how many collision checks we need to perform from possible missed collisions between frames
+    -- including the check for this frame
+    local collision_checks = math.abs(self.x - self.last_x) / self.max_travel_x
+    
+    -- generate our starting x
+    local gen_x = self.last_x   
 
-    -- check how far we travelled
-    local x_distance_travelled = math.abs(self.x - self.last_x)
+    for i = collision_checks, 0, -1 do
 
-    -- if we travelled a distance along x greater than our collision_points_offset 
-    -- we could have missed the collision between frames so we need to check
-    --if x_distance_travelled > self.collision_points_offset then
+        -- move our gen_x according to travel direction
+        if self.dx > 0 then
+            gen_x = gen_x + self.max_travel_x
 
-        -- how many points we need to check for collisions for from in between frames
-        -- atm just checking every point in between last and current position
-        local points_to_generate = x_distance_travelled --math.floor(x_distance_travelled / self.collision_points_offset)
-
-        -- if we travelled far enough to generate more than 1 point,
-        -- we need to subtract 1 from that because we are still checking for
-        -- collisions from this frame after we check if there was any between frames
-        --if points_to_generate > 1 then
-        --    points_to_generate = points_to_generate - 1
-        --end
-
-        -- We will now start generating the point/s and check it for collision using AABB
-
-        -- create a vector from our last position to the current position
-        local last_move_vector_x = self.x - self.last_x
-        local last_move_vector_y = self.y - self.last_y
-
-        -- convert it to a unit vector
-        local vector_length = math.abs(math.sqrt((last_move_vector_x * last_move_vector_x) + (last_move_vector_y * last_move_vector_y)))
-        local unit_vector_x = last_move_vector_x / vector_length
-        local unit_vector_y = last_move_vector_y / vector_length
-
-        -- scale our unit vector by our collision_points_offset
-        -- atm just checking every point in between last and current position so collision_points_offset is only 1
-        local move_vector_x = unit_vector_x * self.collision_points_offset
-        local move_vector_y = unit_vector_y * self.collision_points_offset
-
-        -- using a while loop here atm because for loop syntax was a bit weird
-        local i = 1
-        while (i <= points_to_generate) do
-
-            -- will change to false if there is no possiblity for collision
-            local collided_x = true
-            local collided_y = true
-
-            -- generate our poing by taking our last position and adding our move_vector to it
-            local gen_point_x = self.last_x + move_vector_x
-            local gen_point_y = self.last_y + move_vector_y
-
-            -- first, check to see if the left edge of either is farther to the right
-            -- than the right edge of the other
-            if gen_point_x > paddle.x + paddle.width or paddle.x > gen_point_x + self.width then
-                -- no collision possible on x
-                collided_x = false
+            -- ensure we don't check beyond our current position
+            if gen_x > self.x then
+                gen_x = self.x
             end
+        else
+            gen_x = gen_x - self.max_travel_x
 
-            -- then check to see if the bottom edge of either is higher than the top
-            -- edge of the other
-            if gen_point_y > paddle.y + paddle.height or paddle.y > gen_point_y + self.height then
-                -- no collision possible on y
-                collided_y = false
+            -- ensure we don't check beyond our current position
+            if gen_x < self.x then
+                gen_x = self.x
             end
-
-            self.last_x = gen_point_x
-            self.last_y = gen_point_y
-
-            -- if there was a collision on both x and y then return true, we collided 
-            if (collided_x and collided_y) then
-                return true
-            end
-
-            i = i + 1
         end
-    --end
-   
-    -- if there was no collision above return false
-    return false
 
-    -- We check collisions for current location in this frame here
-    --[[
-    -- first, check to see if the left edge of either is farther to the right
-    -- than the right edge of the other
-    if self.x > paddle.x + paddle.width or paddle.x > self.x + self.width then
-        return false
+        -- generate our y using gen_x and the balls slope
+        local gen_y = (self.dy / self.dx) * (gen_x - self.last_x) + self.last_y
+
+        -- If we aren't colliding on both x and y with our generated point then there is no possibility for collision
+        local collided_x = true;
+        local collided_y = true;
+
+        -- first, check to see if the left edge of either is farther to the right
+        -- than the right edge of the other
+        if gen_x > paddle.x + paddle.width or paddle.x > gen_x + self.width then
+            collided_x = false
+        end
+
+        -- then check to see if the bottom edge of either is higher than the top
+        -- edge of the other
+        if gen_y > paddle.y + paddle.height or paddle.y > gen_y + self.height then
+            collided_x = false
+        end
+
+        -- if we are colliding on both axis then return true, there has been a collision
+        if collided_x and collided_y then
+            return true
+        end
+
     end
 
-    -- then check to see if the bottom edge of either is higher than the top
-    -- edge of the other
-    if self.y > paddle.y + paddle.height or paddle.y > self.y + self.height then
-        return false
-    end 
-
-    -- if the above aren't true, they're overlapping
-    return true
-    ]]
+    -- no collisions were detected
+    return false
 end
 
 --[[
@@ -147,6 +103,10 @@ end
 function Ball:reset()
     self.x = VIRTUAL_WIDTH / 2 - 2
     self.y = VIRTUAL_HEIGHT / 2 - 2
+
+    self.last_x = self.x
+    self.last_y = self.y
+
     self.dx = 0
     self.dy = 0
 end

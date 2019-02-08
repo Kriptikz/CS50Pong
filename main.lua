@@ -48,7 +48,7 @@ VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
 -- paddle movement speed
-PADDLE_SPEED = 800
+PADDLE_SPEED = 200
 
 --[[
     Called just once at the beginning of the game; used to set up
@@ -149,7 +149,7 @@ function love.update(dt)
         -- slightly increasing it, then altering the dy based on the position
         -- at which it collided, then playing a sound effect
         if ball:collides(player1) then
-            ball.dx = -ball.dx * 1.03
+            ball.dx = -ball.dx * 2.00
             ball.x = player1.x + 5
 
             -- keep velocity going in the same direction, but randomize it
@@ -305,6 +305,7 @@ function love.keypressed(key)
                 servingPlayer = 1
             end
         end
+    -- left and right ctrl are used for toggling the specified paddles AI
     elseif key == 'lctrl' then
         if player1.ai then
             player1.ai = false
