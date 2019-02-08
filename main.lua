@@ -48,7 +48,7 @@ VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
 -- paddle movement speed
-PADDLE_SPEED = 200
+PADDLE_SPEED = 800
 
 --[[
     Called just once at the beginning of the game; used to set up
