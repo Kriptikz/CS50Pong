@@ -80,6 +80,7 @@ function Ball:collides(paddle)
         local move_vector_x = unit_vector_x * self.collision_points_offset
         local move_vector_y = unit_vector_y * self.collision_points_offset
 
+        -- using a while loop here atm because for loop syntax was a bit weird
         local i = 1
         while (i <= points_to_generate) do
 
@@ -94,19 +95,21 @@ function Ball:collides(paddle)
             -- first, check to see if the left edge of either is farther to the right
             -- than the right edge of the other
             if gen_point_x > paddle.x + paddle.width or paddle.x > gen_point_x + self.width then
+                -- no collision possible on x
                 collided_x = false
             end
 
             -- then check to see if the bottom edge of either is higher than the top
             -- edge of the other
             if gen_point_y > paddle.y + paddle.height or paddle.y > gen_point_y + self.height then
+                -- no collision possible on y
                 collided_y = false
             end
 
             self.last_x = gen_point_x
             self.last_y = gen_point_y
 
-            -- if collided is not false then 
+            -- if there was a collision on both x and y then return true, we collided 
             if (collided_x and collided_y) then
                 return true
             end
