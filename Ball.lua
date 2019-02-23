@@ -25,8 +25,8 @@ function Ball:init(x, y, width, height)
     self.dy = 0
     self.dx = 0
 
-    -- Max x distant the ball can travel before we need to check for collision.
-    -- If the ball travels beyond this in one frame we check between frames
+    -- max x distant the ball can travel before we need to check for collision.
+    -- if the ball travels beyond this in one frame we check between frames
     -- using our last_x and last_y
     self.max_travel_x = 6
 
@@ -41,7 +41,7 @@ end
 ]]
 function Ball:collides(paddle)
 
-    -- We will first calculate how many collision checks we need to perform from possible missed collisions between frames
+    -- we will first calculate how many collision checks we need to perform from possible missed collisions between frames
     -- including the check for this frame
     local collision_checks = math.abs(self.x - self.last_x) / self.max_travel_x
     
@@ -70,20 +70,20 @@ function Ball:collides(paddle)
         -- generate our y using gen_x and the balls slope
         local gen_y = (self.dy / self.dx) * (gen_x - self.last_x) + self.last_y
 
-        -- If we aren't colliding on both x and y with our generated point then there is no possibility for collision
+        -- if we aren't colliding on both x and y with our generated point then there is no possibility for collision
         local collided_x = true;
         local collided_y = true;
 
-        -- first, check to see if the left edge of either is farther to the right
+        -- first, check for collision on the x-axis by checking to see if the left edge of either is farther to the right
         -- than the right edge of the other
         if gen_x > paddle.x + paddle.width or paddle.x > gen_x + self.width then
             collided_x = false
         end
 
-        -- then check to see if the bottom edge of either is higher than the top
-        -- edge of the other
+        -- check for collision on y-axis by checking to see if the bottom edge 
+        -- of either is higher than the top edge of the other
         if gen_y > paddle.y + paddle.height or paddle.y > gen_y + self.height then
-            collided_x = false
+            collided_y = false
         end
 
         -- if we are colliding on both axis then return true, there has been a collision
